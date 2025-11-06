@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Gestión de Stock</h2>
+        <p>Aquí puedes agregar nuevos productos a tu inventario y ver las existencias actuales.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h3>Agregar Nuevo Producto</h3>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('agregar_producto') }}" method="POST" class="row g-3">
+            <div class="col-md-3">
+                <label for="codigo_barras" class="form-label">Código de Barras</label>
+                <input type="text" class="form-control" id="codigo_barras" name="codigo_barras" required>
+            </div>
+            <div class="col-md-4">
+                <label for="nombre" class="form-label">Nombre del Producto</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="col-md-2">
+                <label for="precio_venta" class="form-label">Precio (ej: 18.50)</label>
+                <input type="number" step="0.01" class="form-control" id="precio_venta" name="precio_venta" required>
+            </div>
+            <div class="col-md-2">
+                <label for="existencia" class="form-label">Existencia Inicial</label>
+                <input type="number" class="form-control" id="existencia" name="existencia" value="0" required>
+            </div>
+            <div class="col-md-1 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Agregar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h3>Inventario Actual</h3>
+            </div>
+            <div class="col-md-6">
+                <input type="text" 
+                    id="buscador-stock" 
+                    class="form-control" 
+                    placeholder="Buscar producto por nombre o código...">
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Código de Barras</th>
+                    <th>Nombre</th>
+                    <th>Precio de Venta</th>
+                    <th>Existencia (Stock)</th>
+                    {% if session.rol == 'administrador' %}
+                    <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody id="tabla-inventario">
+                {% for producto in productos %}
+                <tr class="fila-producto">
+                    <td>{{ producto['codigo_barras'] }}</td>
+                    <td>{{ producto['nombre'] }}</td>
+                    <td>Q{{ "%.2f"|format(producto['precio_venta']) }}</td> {% if producto['existencia'] <= 10 %}
+                        <td class="text-danger fw-bold">{{ producto['existencia'] }} (Bajo)</td>
+                    {% else %}
+                        <td>{{ producto['existencia'] }}</td>
+                    {% endif %}
+
+                    {% if session.rol == 'administrador' %}
+                    <td>
+                        <a href="{{ url_for('editar_producto', id=producto['id']) }}" class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+                        <a href="{{ url_for('eliminar_producto', id=producto['id']) }}" 
+                        class="btn btn-danger btn-sm" 
+                        onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">
+                            Eliminar
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay productos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
