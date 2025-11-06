@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Punto de Venta</h2>
+<div class="row">
+    <div class="col-md-8">
+        <h4>Registrar Venta</h4>
+        <div class="input-group mb-3">
+            <input type="text" id="codigo-barras-input" class="form-control" placeholder="Escanear código de barras...">
+            <button class="btn btn-primary" id="buscar-btn">Buscar</button>
+        </div>
+        <div id="mensaje-error" class="alert alert-danger d-none"></div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Subtotal</th>
+                    <th>Quitar</th>
+                </tr>
+            </thead>
+            <tbody id="carrito-tabla">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Total</h3>
+                <h1 id="total-display">Q0.00</h1> <button class="btn btn-success w-100" id="cobrar-btn">Cobrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Historial de Ventas</h2>
+<p>Aquí se muestran todas las ventas registradas, agrupadas por factura.</p>
+
+<div class="accordion" id="accordionVentas">
+
+    {% for id_venta, items_agrupados in historial|groupby('id') %}
+    
+        {% set items = items_agrupados|list %}
+        {% set venta_info = items[0] %}
+
+        <div class="accordion-item">
+            <h2 class="accordion-header d-flex align-items-center" id="heading-{{ venta_info.id }}">
+                
+                <button class="accordion-button collapsed flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ venta_info.id }}">
+                    <span class="fw-bold" style="min-width: 120px;">Venta #{{ venta_info.id }}</span>
+                    <span class="text-muted" style="min-width: 250px;">Fecha: {{ venta_info.fecha }}</span>
+                    <span class="fw-bold">Total: Q{{ "%.2f"|format(venta_info.total) }}</span> </button>
+                
+                {% if session.rol == 'administrador' %}
+                <a href="{{ url_for('eliminar_venta', id_venta=venta_info.id) }}" 
+                class="btn btn-danger btn-sm flex-shrink-0 ms-2 me-3" 
+                onclick="return confirm('¿Estás seguro de eliminar esta venta? El stock será devuelto al inventario.');"
+                title="Eliminar Venta">
+                    Eliminar
+                </a>
+                {% endif %}
+            </h2>
+            
+            <div id="collapse-{{ venta_info.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionVentas">
+                <div class="accordion-body">
+                    <h5>Detalle de la Venta:</h5>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.nombre }}</td>
+                                <td>{{ item.cantidad }}</td>
+                                <td>Q{{ "%.2f"|format(item.precio_unitario) }}</td> </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="alert alert-info">
+            No hay ventas registradas todavía.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
